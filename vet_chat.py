@@ -22,7 +22,7 @@ Recibís descripciones clínicas e historial de signos clínicos.
 Respondés en español con:
 - Diagnóstico presuntivo
 - Diagnóstico diferencial (mínimo 2 posibles)
-- Pasos diagnósticos complementarios
+- Indicás pasos diagnósticos complementarios
 - Recomendaciones clínicas generales
 - Indicás tratamiento específico para el diagnóstico presuntivo
 - Indicás principios activos o grupos farmacológicos, según el diagnóstico presuntivo.
@@ -31,7 +31,7 @@ Siempre recordás que es imprescindible la evaluación presencial.
 
     # Solicitud a la API de OpenAI
     respuesta = client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": instrucciones},
             {"role": "user", "content": prompt}
