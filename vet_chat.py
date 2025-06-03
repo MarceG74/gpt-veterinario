@@ -13,7 +13,7 @@ st.write("Consultá casos clínicos de perros y gatos ingresando signos clínico
 prompt = st.text_area("✍️ Describí el caso clínico:", height=200)
 
 # Botón de consulta
-if st.button("Consultar IA"):
+if st.button("Consultar"):
     instrucciones = """
     Actuás como un clínico veterinario especializado en perros y gatos.
     Recibís descripciones clínicas e historial de signos o síntomas.
