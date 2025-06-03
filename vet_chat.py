@@ -31,7 +31,7 @@ Siempre recordás que es imprescindible la evaluación presencial.
 
     # Solicitud a la API de OpenAI
     respuesta = client.chat.completions.create(
-        model="GPT-3.5-Turbo-0125",
+        model="gpt-3.5-turbo",
         messages=[
             {"role": "system", "content": instrucciones},
             {"role": "user", "content": prompt}
