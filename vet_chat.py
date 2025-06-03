@@ -1,43 +1,56 @@
 import streamlit as st
-from openai import OpenAI
+import openai
 
-# Configuración inicial de la app
-st.set_page_config(page_title="Vet GPT", page_icon="🐾")
-st.title("🩺 Vet GPT 🐶🐱")
-st.markdown("Consultas orientativas para colegas. **Especializado en perros y gatos.**")
+# Configuración de la API de OpenRouter
+openai.api_key = st.secrets["OPENROUTER_API_KEY"]
+openai.base_url = "https://openrouter.ai/api/v1"
 
-# Campo de entrada del usuario
-prompt = st.text_area("✍️ Describí el caso clínico:")
+# Configuración de la página
+st.set_page_config(page_title="VetChat - Diagnóstico Veterinario")
+st.title("🐾 VetChat para Veterinarios")
+st.markdown("Ingresá los **síntomas o signos clínicos** del paciente y recibí una orientación profesional.")
 
-# Configuración del cliente OpenAI. Clave API desde configuración de Streamlit Cloud
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+# Selector de modelo
+modelos_disponibles = {
+    "Mistral (rápido y gratuito)": "mistralai/mistral-7b-instruct",
+    "Gemma (Google, claro y preciso)": "google/gemma-7b-it",
+    "OpenChat (estilo ChatGPT)": "openchat/openchat-7b",
+    "Neural Chat (Intel, generalista)": "intel/neural-chat-7b",
+}
+modelo_seleccionado = st.selectbox("🧠 Elegí el modelo de IA:", list(modelos_disponibles.keys()))
+modelo_id = modelos_disponibles[modelo_seleccionado]
 
-# Lógica al presionar el botón
-if st.button("Consultar") and prompt:
+# Campo de entrada de síntomas
+entrada = st.text_area("📋 Ingresá los síntomas clínicos observados:")
 
-    # Instrucciones al modelo GPT
-    instrucciones = """
-Actuás como un clínico veterinario especializado en perros y gatos.
-Recibís descripciones clínicas e historial de signos clínicos.
-Respondés en español con:
-- Diagnóstico presuntivo
-- Diagnóstico diferencial (mínimo 2 posibles)
-- Indicás pasos diagnósticos complementarios
-- Recomendaciones clínicas generales
-- Indicás tratamiento específico para el diagnóstico presuntivo
-- Indicás principios activos o grupos farmacológicos, según el diagnóstico presuntivo.
-Siempre recordás que es imprescindible la evaluación presencial.
-"""
+# Botón para analizar
+if st.button("Analizar"):
+    if entrada.strip() == "":
+        st.warning("Por favor, ingresá una descripción antes de analizar.")
+    else:
+        with st.spinner("Analizando caso..."):
 
-    # Solicitud a la API de OpenAI
-    respuesta = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": instrucciones},
-            {"role": "user", "content": prompt}
-        ]
-    )
+            # Enviar la consulta al modelo
+            try:
+                respuesta = openai.ChatCompletion.create(
+                    model=modelo_id,
+                    messages=[
+                        {
+                            "role": "system",
+                            "content": (
+                                "Sos un veterinario clínico experto en perros y gatos. "
+                                "Respondé de forma clara, profesional, y sin hacer diagnósticos definitivos. "
+                                "Ofrecé posibles causas, estudios complementarios sugeridos y conducta a seguir."
+                            ),
+                        },
+                        {"role": "user", "content": entrada},
+                    ],
+                )
 
-    # Mostrar la respuesta generada
-    st.markdown("### 🧾 Respuesta de Vet GPT:")
-    st.write(respuesta.choices[0].message.content)
+                # Mostrar la respuesta del modelo
+                mensaje = respuesta['choices'][0]['message']['content']
+                st.success("💡 Posible orientación:")
+                st.markdown(mensaje)
+
+            except Exception as e:
+                st.error(f"Ocurrió un error al consultar el modelo: {e}")
