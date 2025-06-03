@@ -38,8 +38,6 @@ Siempre recordás que es imprescindible la evaluación presencial.
         ]
     )
 
-    # -------------------------------
     # Mostrar la respuesta generada
-    # -------------------------------
     st.markdown("### 🧾 Respuesta de Vet GPT:")
     st.write(respuesta.choices[0].message.content)
