@@ -7,7 +7,7 @@ openai.api_key = st.secrets["OPENAI_API_KEY"]
 st.set_page_config(page_title="GPT Veterinario", layout="centered")
 
 st.title("M.V. GPT 🐶🐱")
-st.write("Consultá casos clínicos de perros y gatos ingresando signos, síntomas y evolución.")
+st.write("Consultá casos clínicos de perros y gatos ingresando signos clínicos.")
 
 # Campo de entrada
 prompt = st.text_area("✍️ Describí el caso clínico:", height=200)
