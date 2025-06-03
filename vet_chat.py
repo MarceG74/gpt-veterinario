@@ -1,31 +1,36 @@
-import openai
 import streamlit as st
+from openai import OpenAI
 
-# Clave API desde configuración de Streamlit Cloud
-openai.api_key = st.secrets["OPENAI_API_KEY"]
+# Configuración inicial de la app
+st.set_page_config(page_title="Vet GPT", page_icon="🐾")
+st.title("🩺 Vet GPT 🐶🐱")
+st.markdown("Consultas orientativas para colegas. **Especializado en perros y gatos.**")
 
-st.set_page_config(page_title="GPT Veterinario", layout="centered")
+# Campo de entrada del usuario
+prompt = st.text_area("✍️ Describí el caso clínico:")
 
-st.title("M.V. GPT 🐶🐱")
-st.write("Consultá casos clínicos de perros y gatos ingresando signos clínicos.")
+# Configuración del cliente OpenAI. Clave API desde configuración de Streamlit Cloud
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# Campo de entrada
-prompt = st.text_area("✍️ Describí el caso clínico:", height=200)
+# Lógica al presionar el botón
+if st.button("Consultar") and prompt:
 
-# Botón de consulta
-if st.button("Consultar"):
+    # Instrucciones al modelo GPT
     instrucciones = """
-    Actuás como un clínico veterinario especializado en perros y gatos.
-    Recibís descripciones clínicas e historial de signos o síntomas.
-    Respondés en español con:
-    - Diagnóstico presuntivo
-    - Diagnóstico diferencial (mínimo 2 posibles)
-    - Indicaciones de pasos diagnósticos complementarios
-    - Recomendaciones clínicas generales y específicas para el diagnóstico presuntivo
-    Indicás principios activos o grupos farmacológicos orientativos, según el diagnóstico presuntivo.
-    """
+Actuás como un clínico veterinario especializado en perros y gatos.
+Recibís descripciones clínicas e historial de signos clínicos.
+Respondés en español con:
+- Diagnóstico presuntivo
+- Diagnóstico diferencial (mínimo 2 posibles)
+- Pasos diagnósticos complementarios
+- Recomendaciones clínicas generales
+- Indicás tratamiento específico para el diagnóstico presuntivo
+- Indicás principios activos o grupos farmacológicos, según el diagnóstico presuntivo.
+Siempre recordás que es imprescindible la evaluación presencial.
+"""
 
-    respuesta = openai.ChatCompletion.create(
+    # Solicitud a la API de OpenAI
+    respuesta = client.chat.completions.create(
         model="gpt-4",
         messages=[
             {"role": "system", "content": instrucciones},
@@ -33,6 +38,8 @@ if st.button("Consultar"):
         ]
     )
 
-    # Mostrar la respuesta
-    st.markdown("### 🧾 Respuesta del M.V. GPT:")
-    st.write(respuesta['choices'][0]['message']['content'])
+    # -------------------------------
+    # Mostrar la respuesta generada
+    # -------------------------------
+    st.markdown("### 🧾 Respuesta de Vet GPT:")
+    st.write(respuesta.choices[0].message.content)
